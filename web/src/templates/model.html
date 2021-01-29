@@ -1,0 +1,200 @@
+<html>
+
+<head>
+<!-- <meta http-equiv="refresh" content="60"/> -->
+<title>计算模型</title>
+<style>
+  .container<overflow: hidden}
+  
+  .tab2{float: left;}
+  
+  .tab2{margin-left: 300px}
+  tr{transition:all .25s ease-in-out}
+  tr:hover{background-color:#EEE; cursor: pointer}
+  .input(display: block;margin-bottom: 10px}
+  
+</style>
+
+  <ul>
+    <li>确认拿出的数据 可修改</li>
+    <li>可点击row修改，可增，减row</li>
+    <li>如果你刷新界面，你的改动会全部丢失，回归default</li>
+    <li>如果你返回，改动会全部丢失</li>
+    <li>计算之前一定要在表格里留足够的数据，不然空缺的cell当0处理，用0计算</li>
+  </ul> 
+
+</head>
+
+<body>
+  <body onload='executeAsynchronously([getDefaultVehicle_Population_Table, getDefaultMileage_Table, getDefaultFE_Numbers_Table, getDefaultEV_Numbers_Table], 1);'>
+
+  <div class="container">
+  
+    <!-- <div class="tab1"> -->
+      <!-- <table id="table" border="1"> -->
+        <!-- <caption>table 1</caption> -->
+        <!-- <tr> -->
+          <!-- <th>First Name</th> -->
+          <!-- <th>Last Name</th> -->
+          <!-- <th>Age</th> -->
+        <!-- </tr> -->
+        <!-- <tr> -->
+          <!-- <td>A1</td> -->
+          <!-- <td>A2</td> -->
+          <!-- <td>1</td> -->
+        <!-- </tr> -->
+        <!-- <tr> -->
+          <!-- <td>B1</td> -->
+          <!-- <td>B2</td> -->
+          <!-- <td>2</td> -->
+        <!-- </tr> -->
+      <!-- </table> -->
+    <!-- </div> -->
+    <!-- <div class="tab2"> -->
+      <!-- First Name :<input class="input" type="text" name="fname" id="fname"> -->
+      <!-- Last Name :<input class="input" type="text" name="lname" id="lname"> -->
+      <!-- Age :<input type="number" name="age" id="age"> -->
+      
+      <!-- <button onclick="addHTMLTableRow();">Add</button> -->
+      <!-- <button onclick="editHtmlTableSelecctedRow();">Edit</button> -->
+      <!-- <button onclick="removeSelectedRow();">Remove</button> -->
+    <!-- </div> -->
+  <!-- </div> -->
+  
+  <div class="container">
+    <div class="tab1">
+      <table id="Vehicle_Population_Table" border="1">
+        <caption id="table0caption">Vehicle Population</caption>
+      </table>
+    </div>
+    <div class="tab2">
+      Time :<input class="input" type="text" name="Time" id="Time_Vehicle_Population_Table">
+      Passenger_Vehicle :<input class="input" type="number" step="0.001" name="Passenger_Vehicle" id="Passenger_Vehicle_Vehicle_Population_Table">
+      Taxi :<input type="number" step="0.001" name="Taxi" id="Taxi_Vehicle_Vehicle_Population_Table">
+      Light_Duty_Commercial_Vehicle :<input type="number" step="0.001" name="Light_Duty_Commercial_Vehicle" id="Light_Duty_Commercial_Vehicle_Vehicle_Population_Table">
+      Medium_Duty_Bus_Urban_Bus :<input type="number" step="0.001" name="Medium_Duty_Bus_Urban_Bus" id="Medium_Duty_Bus_Urban_Bus_Vehicle_Population_Table">
+      Large_Duty_Bus_Road_Bus :<input type="number" step="0.001" name="Large_Duty_Bus_Road_Bus" id="Large_Duty_Bus_Road_Bus_Vehicle_Population_Table">
+      Heavy_Duty_Commercial_Vehicle :<input type="number" step="0.001" name="Heavy_Duty_Commercial_Vehicle" id="Heavy_Duty_Commercial_Vehicle_Vehicle_Population_Table">
+      Total :<input type="number" step="0.001" name="Total" id="Total_Vehicle_Population_Table">
+      LDV :<input type="number" step="0.001" name="LDV" id="LDV_Vehicle_Population_Table">
+      LDT_LDV :<input type="text" name="LDT_LDV" id="LDT_LDV_Vehicle_Population_Table">
+      
+      <button onclick="addHTMLVehicle_Population_TableRow();">Add</button>
+      <button onclick="editHtmlVehicle_Population_TableSelecctedRow();">Edit</button>
+      <button onclick="removeSelectedRowVehicle_Population_Table();">Remove</button>
+      <button onclick="restoreDefaultVehicle_Population_Table();">Restore Default</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="tab1">
+      <table id="Mileage_Table" border="1">
+        <caption id="table0caption">Mileage</caption>
+      </table>
+    </div>
+    <div class="tab2">
+      Time :<input class="input" type="text" name="Time_Mileage_Table" id="Time_Mileage_Table">
+      PV :<input class="input" type="number" step="0.001" name="PV_Mileage_Table" id="PV_Mileage_Table">
+      Taxi :<input class="input" type="number" step="0.001" name="Taxi_Mileage_Table" id="Taxi_Mileage_Table">
+      LDT :<input class="input" type="number" step="0.001" name="LDT_Mileage_Table" id="LDT_Mileage_Table">
+      Urban_Bus :<input class="input" type="number" step="0.001" name="Urban_Bus_Mileage_Table" id="Urban_Bus_Mileage_Table">
+      Road_Bus :<input class="input" type="number" step="0.001" name="Road_Bus_Mileage_Table" id="Road_Bus_Mileage_Table">
+      HDV_Truck :<input class="input" type="number" step="0.001" name="HDV_Truck_Mileage_Table" id="HDV_Truck_Mileage_Table">
+      
+      
+      <button onclick="addHTMLMileage_TableRow();">Add</button>
+      <button onclick="editHtmlMileage_TableSelecctedRow();">Edit</button>
+      <button onclick="removeSelectedRowMileage_Table();">Remove</button>
+      <button onclick="restoreDefaultMileage_Table();">Restore Default</button>
+    </div>
+  </div>
+  
+  
+  <div class="container">
+    <div class="tab1">
+      <table id="FE_Numbers_Table" border="1">
+        <caption id="table0caption">FE Numbers</caption>
+      </table>
+    </div>
+    <div class="tab2">
+      Time :<input class="input" type="text" name="Time_FE_Numbers_Table" id="Time_FE_Numbers_Table">
+      PV :<input class="input" type="number" step="0.001" name="PV_FE_Numbers_Table" id="PV_FE_Numbers_Table">
+      Taxi :<input class="input" type="number" step="0.001" name="Taxi_FE_Numbers_Table" id="Taxi_FE_Numbers_Table">
+      LDT :<input class="input" type="number" step="0.001" name="LDT_FE_Numbers_Table" id="LDT_FE_Numbers_Table">
+      Urban_Bus :<input class="input" type="number" step="0.001" name="Urban_Bus_FE_Numbers_Table" id="Urban_Bus_FE_Numbers_Table">
+      Road_Bus :<input class="input" type="number" step="0.001" name="Road_Bus_FE_Numbers_Table" id="Road_Bus_FE_Numbers_Table">
+      HDV :<input class="input" type="number" step="0.001" name="HDV_FE_Numbers_Table" id="HDV_FE_Numbers_Table">
+      
+      
+      <button onclick="addHTMLFE_Numbers_TableRow();">Add</button>
+      <button onclick="editHtmlFE_Numbers_TableSelecctedRow();">Edit</button>
+      <button onclick="removeSelectedRowFE_Numbers_Table();">Remove</button>
+      <button onclick="restoreDefaultFE_Numbers_Table();">Restore Default</button>
+    </div>
+  </div>
+  
+  
+  <div class="container">
+    <div class="tab1">
+      <table id="EV_Numbers_Table" border="1">
+        <caption id="table0caption">EV Numbers(million)</caption>
+      </table>
+    </div>
+    <div class="tab2">
+      Time :<input class="input" type="text" name="Time_EV_Numbers_Table" id="Time_EV_Numbers_Table">
+      Sales :<input class="input" type="text" name="Sales_EV_Numbers_Table" id="Sales_EV_Numbers_Table">
+      PV :<input class="input" type="number" step="0.001" name="PV_EV_Numbers_Table" id="PV_EV_Numbers_Table">
+      Taxi :<input class="input" type="number" step="0.001" name="Taxi_EV_Numbers_Table" id="Taxi_EV_Numbers_Table">
+      LDT :<input class="input" type="number" step="0.001" name="LDT_EV_Numbers_Table" id="LDT_EV_Numbers_Table">
+      Urban_Bus :<input class="input" type="number" step="0.001" name="Urban_Bus_EV_Numbers_Table" id="Urban_Bus_EV_Numbers_Table">
+      Road_Bus :<input class="input" type="number" step="0.001" name="Road_Bus_EV_Numbers_Table" id="Road_Bus_EV_Numbers_Table">
+      HDV :<input class="input" type="number" step="0.001" name="HDV_EV_Numbers_Table" id="HDV_EV_Numbers_Table">
+      
+      
+      <button onclick="addHTMLEV_Numbers_TableRow();">Add</button>
+      <button onclick="editHtmlEV_Numbers_TableSelecctedRow();">Edit</button>
+      <button onclick="removeSelectedRowEV_Numbers_Table();">Remove</button>
+      <button onclick="restoreDefaultEV_Numbers_Table();">Restore Default</button>
+    </div>
+  </div>
+  
+  <!-- <div id="news"> -->
+    <!-- News: -->
+  <!-- </div> -->
+  <script src="main.js"></script>
+  
+  <div class='field select '>
+            <label> 选择方案: &nbsp;</label>
+            <div class="select margin-top-lg">
+              <select>
+                <option>business as usual</option>
+                <option>option 2</option>
+                <option>option 3</option>
+                <option>option 4</option>
+                <option>option 5</option>
+                <option>option 6</option>
+                <option>option 7</option>
+                <option>option 8</option>
+                <option>option 9</option>
+                <option>option 10</option>
+              </select>
+              <div class="select__arrow"></div>
+            </div>
+  </div>
+  <br>
+  <div>   
+    <button style='padding:2rem'  id = 'logbtn' onclick="notSupportedYet();">计算结果</button>
+  </div>
+  <br>
+  <form name='backToWelcomePage' action='/'>         
+    <button style='padding:2rem' type='submit' id = 'logbtn'>Back To Welcome Page</button>
+  </form>
+  
+</body>
+
+
+
+
+
+
+</html>

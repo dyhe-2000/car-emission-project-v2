@@ -1,0 +1,643 @@
+<!doctype html>
+<html>
+	<head>
+		<style>
+			.vertical-center {
+				margin:0 auto;
+				display:block;
+			}
+		</style>
+		<meta charset="UTF-8">
+		<title>计算模型 step one</title>
+		<ul>
+			<li>确认拿出的数据 可直接点单个cell修改</li>
+			<li>如果你刷新界面，你的改动会全部丢失，回归default</li>
+			<li>如果你返回，改动会全部丢失</li>
+			<li>计算之前一定要在表格里留足够的数据，不然空缺的cell当0处理，用0计算</li>
+			<li>该有数字的cell若有非数字，cell当0处理，用0计算</li>
+			<li>画图,下载Excel完全根据表格里的数据，如果你不想搞笑，别忘先选方案，计算</li>
+		</ul> 
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="chart.js"></script>
+		<script src="jquery.js"></script>		
+		<script src="xlsx.full.min.js"></script>	
+		<script src="FileSaver.js"></script>	
+		<script type="text/javascript">
+		$(document).ready(function($)
+		{
+			//ajax row data
+			var kabR_data = 
+			[
+				{情况:"基准情景", k:410, a:0.00605, b:0.78693},
+				{情况:"高饱和情景", k:505, a:0.00598, b:0.80759},
+				{情况:"低饱和情景", k:315, a:0.00537, b:0.74883},
+			]
+			
+			var 不知道叫什么_data = 
+			[
+				{"年":2019, "GDP人均GDP增速":6.60, "GDP预测(亿元)":990865.1, "人口增量":0.280, "总人口预测(万人)":140005, "人均GDP预测(万/人)":7.077355094, "私人保有率(辆/千人)":160.6426341, "车辆总量(万辆)":22490.77198},
+				{"年":2020, "GDP人均GDP增速":6.00, "GDP预测(亿元)":1053257.894, "人口增量":0.280, "总人口预测(万人)":140397.014, "人均GDP预测(万/人)":7.5019964, "私人保有率(辆/千人)":175.884982, "车辆总量(万辆)":24693.72628},
+				{"年":2021, "GDP人均GDP增速":5.59, "GDP预测(亿元)":1114943.718, "人口增量":0.250, "总人口预测(万人)":140748.0065, "人均GDP预测(万/人)":7.921559568, "私人保有率(辆/千人)":190.7145436, "车辆总量(万辆)":26842.69183},
+				{"年":2022, "GDP人均GDP增速":5.42, "GDP预测(亿元)":1177829.192, "人口增量":0.210, "总人口预测(万人)":141043.5773, "人均GDP预测(万/人)":8.350817629, "私人保有率(辆/千人)":205.5294, "车辆总量(万辆)":28988.60183},
+				{"年":2023, "GDP人均GDP增速":5.26, "GDP预测(亿元)":1241893.412, "人口增量":0.170, "总人口预测(万人)":141283.3514, "人均GDP预测(万/人)":8.790090268, "私人保有率(辆/千人)":220.2099474, "车辆总量(万辆)":31111.99939},
+				{"年":2024, "GDP人均GDP增速":5.11, "GDP预测(亿元)":1307097.388, "人口增量":0.130, "总人口预测(万人)":141467.0198, "人均GDP预测(万/人)":9.239590892, "私人保有率(辆/千人)":234.6395245, "车辆总量(万辆)":33193.75426},
+				{"年":2025, "GDP人均GDP增速":5.00, "GDP预测(亿元)":1373697.869, "人口增量":0.090, "总人口预测(万人)":141594.3401, "人均GDP预测(万/人)":9.701643924, "私人保有率(辆/千人)":248.7736802, "车辆总量(万辆)":35224.94508},
+				{"年":2026, "GDP人均GDP增速":4.51, "GDP预测(亿元)":1436360.047, "人口增量":0.050, "总人口预测(万人)":141665.1373, "人均GDP预测(万/人)":10.13912156, "私人保有率(辆/千人)":261.4556841, "车辆总量(万辆)":37039.15538},
+				{"年":2027, "GDP人均GDP增速":4.39, "GDP预测(亿元)":1499503.722, "人口增量":0.010, "总人口预测(万人)":141679.3038, "人均GDP预测(万/人)":10.58378805, "私人保有率(辆/千人)":273.6185688, "车辆总量(万辆)":38766.08833},
+				{"年":2028, "GDP人均GDP增速":4.27, "GDP预测(亿元)":1563327.24, "人口增量":-0.013, "总人口预测(万人)":141661.5939, "人均GDP预测(万/人)":11.03564627, "私人保有率(辆/千人)":285.2128109, "车辆总量(万辆)":40403.70139},
+				{"年":2029, "GDP人均GDP增速":4.16, "GDP预测(亿元)":1627812.719, "人口增量":-0.035, "总人口预测(万人)":141612.0123, "人均GDP预测(万/人)":11.49487739, "私人保有率(辆/千人)":296.2051714, "车辆总量(万辆)":41946.21038},
+				{"年":2030, "GDP人均GDP增速":4.06, "GDP预测(亿元)":1692959.182, "人口增量":-0.058, "总人口预测(万人)":141530.5854, "人均GDP预测(万/人)":11.96179029, "私人保有率(辆/千人)":306.5755261, "车辆总量(万辆)":43389.81368},
+				{"年":2031, "GDP人均GDP增速":3.58, "GDP预测(亿元)":1752235.372, "人口增量":-0.080, "总人口预测(万人)":141417.3609, "人均GDP预测(万/人)":12.39052518, "私人保有率(辆/千人)":315.4009808, "车辆总量(万辆)":44603.17435},
+				{"年":2032, "GDP人均GDP增速":3.50, "GDP预测(亿元)":1811642.397, "人口增量":-0.103, "总人口预测(万人)":141272.4081, "人均GDP预测(万/人)":12.8237525, "私人保有率(辆/千人)":323.6650751, "车辆总量(万辆)":45724.94459},
+				{"年":2033, "GDP人均GDP增速":3.41, "GDP预测(亿元)":1871139.428, "人口增量":-0.125, "总人口预测(万人)":141095.8176, "人均GDP预测(万/人)":13.26148046, "私人保有率(辆/千人)":331.3758336, "车辆总量(万辆)":46755.74419},
+				{"年":2034, "GDP人均GDP增速":3.33, "GDP预测(亿元)":1930687.553, "人口增量":-0.148, "总人口预测(万人)":140887.7013, "人均GDP预测(万/人)":13.70373379, "私人保有率(辆/千人)":338.5461815, "车辆总量(万辆)":47696.9933},
+				{"年":2035, "GDP人均GDP增速":3.26, "GDP预测(亿元)":1990280.431, "人口增量":-0.170, "总人口预测(万人)":140648.1922, "人均GDP预测(万/人)":14.15077151, "私人保有率(辆/千人)":345.1961141, "车辆总量(万辆)":48551.20941},
+				{"年":2036, "GDP人均GDP增速":3.18, "GDP预测(亿元)":2049573.488, "人口增量":-0.193, "总人口预测(万人)":140377.4444, "人均GDP预测(万/人)":14.60044736, "私人保有率(辆/千人)":351.3161815, "车辆总量(万辆)":49316.86775},
+				{"年":2037, "GDP人均GDP增速":3.12, "GDP预测(亿元)":2109012.803, "人口增量":-0.215, "总人口预测(万人)":140075.6329, "人均GDP预测(万/人)":15.05624325, "私人保有率(辆/千人)":356.9760319, "车辆总量(万辆)":50003.64361},
+				{"年":2038, "GDP人均GDP增速":3.07, "GDP预测(亿元)":2168571.531, "人口增量":-0.238, "总人口预测(万人)":139742.9533, "人均GDP预测(万/人)":15.51828897, "私人保有率(辆/千人)":362.1950613, "车辆总量(万辆)":50614.20754},
+				{"年":2039, "GDP人均GDP增速":3.02, "GDP预测(亿元)":2228224.669, "人口增量":-0.260, "总人口预测(万人)":139379.6216, "人均GDP预测(万/人)":15.98673208, "私人保有率(辆/千人)":366.9941864, "车辆总量(万辆)":51151.51084},
+				{"年":2040, "GDP人均GDP增速":2.95, "GDP预测(亿元)":2287374.378, "人口增量":-0.283, "总人口预测(万人)":138985.8742, "人均GDP预测(万/人)":16.45760327, "私人保有率(辆/千人)":371.358947, "车辆总量(万辆)":51613.64789},
+				{"年":2041, "GDP人均GDP增速":2.52, "GDP预测(亿元)":2337549.342, "人口增量":-0.316, "总人口预测(万人)":138547.3738, "人均GDP预测(万/人)":16.87184159, "私人保有率(辆/千人)":374.8487428, "车辆总量(万辆)":51934.30888},
+				{"年":2042, "GDP人均GDP增速":2.48, "GDP预测(亿元)":2387288.372, "人口增量":-0.349, "总人口预测(万人)":138064.5362, "人均GDP预测(万/人)":17.29110486, "私人保有率(辆/千人)":378.0739931, "车辆总量(万辆)":52198.61049},
+				{"年":2043, "GDP人均GDP增速":2.44, "GDP预测(亿元)":2436258.714, "人口增量":-0.382, "总人口预测(万人)":137537.82, "人均GDP预测(万/人)":17.71337306, "私人保有率(辆/千人)":381.0349715, "车辆总量(万辆)":52406.71931},
+				{"年":2044, "GDP人均GDP增速":2.40, "GDP预测(亿元)":2484423.165, "人口增量":-0.415, "总人口预测(万人)":136967.7257, "人均GDP预测(万/人)":18.13874876, "私人保有率(辆/千人)":383.7498678, "车辆总量(万辆)":52561.34662},
+				{"年":2045, "GDP人均GDP增速":2.34, "GDP预测(亿元)":2531109.696, "人口增量":-0.448, "总人口预测(万人)":136354.7951, "人均GDP预测(万/人)":18.56267463, "私人保有率(辆/千人)":386.2102791, "车辆总量(万辆)":52661.62348},
+				{"年":2046, "GDP人均GDP增速":2.29, "GDP预测(亿元)":2576571.84, "人口增量":-0.481, "总人口预测(万人)":135699.6103, "人均GDP预测(万/人)":18.98731937, "私人保有率(辆/千人)":388.450211, "车辆总量(万辆)":52712.54226},
+				{"年":2047, "GDP人均GDP增速":2.25, "GDP预测(亿元)":2621134.379, "人口增量":-0.514, "总人口预测(万人)":135002.7928, "人均GDP预测(万/人)":19.41540855, "私人保有率(辆/千人)":390.5003138, "车辆总量(万辆)":52718.63296},
+				{"年":2048, "GDP人均GDP增速":2.23, "GDP预测(亿元)":2665059.004, "人口增量":-0.547, "总人口预测(万人)":134265.0026, "人均GDP预测(万/人)":19.84924555, "私人保有率(辆/千人)":392.3835859, "车辆总量(万辆)":52683.38317},
+				{"年":2049, "GDP人均GDP增速":2.23, "GDP预测(亿元)":2708785.644, "人口增量":-0.580, "总人口预测(万人)":133486.9369, "人均GDP预测(万/人)":20.29251481, "私人保有率(辆/千人)":394.1239126, "车辆总量(万辆)":52610.39385},
+				{"年":2050, "GDP人均GDP增速":2.20, "GDP预测(亿元)":2751533.023, "人口增量":-0.613, "总人口预测(万人)":132669.3294, "人均GDP预测(万/人)":20.7397824, "私人保有率(辆/千人)":395.7089166, "车辆总量(万辆)":52498.4366},
+			]
+			
+			var random_id = function()
+			{
+				var id_num = Math.random().toString(9).substr(2,3);
+				var id_str = Math.random().toString(36).substr(2);
+				
+				return id_num + id_str;
+			}
+			
+			//--->create data table > start
+			var kabR_tbl = '';
+			kabR_tbl +='<table class="table table-hover" id="kabR table">'
+			
+				//--->create table header > start
+				kabR_tbl +='<thead>';
+					kabR_tbl +='<tr>';
+					kabR_tbl +='<th>情况</th>';
+					kabR_tbl +='<th>k</th>';
+					kabR_tbl +='<th>a</th>';
+					kabR_tbl +='<th>b</th>';
+					kabR_tbl +='<th>Options</th>';
+					kabR_tbl +='</tr>';
+			    kabR_tbl +='</thead>';
+				//--->create table header > end
+			
+				//--->create table body > start
+				kabR_tbl +='<tbody>';
+				
+					//let row_id = 0;
+					//--->create table body rows > start
+					$.each(kabR_data, function(index, val)
+					{
+						//you can replace with your database row id
+						//var row_id = random_id();
+						var row_id = index;
+						
+						//loop through ajax row data
+						kabR_tbl +='<tr row_id="'+row_id+'" table_name="kabR table">';
+							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="情况">'+val['情况']+'</div></td>';
+							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="k">'+val['k']+'</div></td>';
+							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="a">'+val['a']+'</div></td>';
+							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="b">'+val['b']+'</div></td>';
+							
+							//--->edit options > start
+							kabR_tbl +='<td>';
+							
+								kabR_tbl +='<span class="btn_edit" table_name="kabR table"> <a href="#" class="btn btn-link " row_id="'+row_id+'" > Edit</a> </span>';
+								
+								//only show this button if edit button is clicked
+								kabR_tbl +='<span class="btn_save" table_name="kabR table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Save</a> | </span>';
+								kabR_tbl +='<span class="btn_cancel" table_name="kabR table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Cancel</a> | </span>';
+								
+							kabR_tbl +='</td>';
+							//--->edit options > end
+							
+						kabR_tbl +='</tr>';
+						//++row_id;
+					});
+					
+					//--->create table body rows > end
+				
+				kabR_tbl +='</tbody>';
+				//--->create table body > end
+				
+			kabR_tbl +='</table>';
+			//--->create data table > end
+			
+			//--->create data table > start
+			var second_tbl = '';
+			second_tbl +='<table class="table table-hover" id="second table">'
+			
+				//--->create table header > start
+				second_tbl +='<thead>';
+					second_tbl +='<tr>';
+					second_tbl +='<th>年</th>';
+					second_tbl +='<th>GDP人均GDP增速</th>';
+					second_tbl +='<th>GDP预测(亿元)</th>';
+					second_tbl +='<th>人口增量</th>';
+					second_tbl +='<th>总人口预测(万人)</th>';
+					second_tbl +='<th>人均GDP预测(万/人)</th>';
+					second_tbl +='<th>私人保有率(辆/千人)</th>';
+					second_tbl +='<th>车辆总量(万辆)</th>';
+					second_tbl +='<th>Options</th>';
+					second_tbl +='</tr>';
+			    second_tbl +='</thead>';
+				//--->create table header > end
+			
+				//--->create table body > start
+				second_tbl +='<tbody>';
+				
+					//let row_id = 0;
+					//--->create table body rows > start
+					$.each(不知道叫什么_data, function(index, val)
+					{
+						//you can replace with your database row id
+						//var row_id = random_id();
+						var row_id = index;
+						
+						//loop through ajax row data
+						second_tbl +='<tr row_id="'+row_id+'" table_name="second table">';
+							second_tbl +='<td ><div edit_type="click" col_name="年">'+val['年']+'</div></td>';
+							second_tbl +='<td ><div class="row_data" edit_type="click" col_name="GDP人均GDP增速">'+val['GDP人均GDP增速']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="GDP预测(亿元)">'+val['GDP预测(亿元)']+'</div></td>';
+							second_tbl +='<td ><div class="row_data" edit_type="click" col_name="人口增量">'+val['人口增量']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="总人口预测(万人)">'+val['总人口预测(万人)']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="人均GDP预测(万/人)">'+val['人均GDP预测(万/人)']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="私人保有率(辆/千人)">'+val['私人保有率(辆/千人)']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="车辆总量(万辆)">'+val['车辆总量(万辆)']+'</div></td>';
+							
+							//--->edit options > start
+							second_tbl +='<td>';
+							
+								second_tbl +='<span class="btn_edit" table_name="second table"> <a href="#" class="btn btn-link " row_id="'+row_id+'" > Edit</a> </span>';
+								
+								//only show this button if edit button is clicked
+								second_tbl +='<span class="btn_save" table_name="second table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Save</a> | </span>';
+								second_tbl +='<span class="btn_cancel" table_name="second table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Cancel</a> | </span>';
+								
+							second_tbl +='</td>';
+							//--->edit options > end
+							
+						second_tbl +='</tr>';
+						//++row_id;
+					});
+					
+					//--->create table body rows > end
+				
+				second_tbl +='</tbody>';
+				//--->create table body > end
+				
+			second_tbl +='</table>';
+			//--->create data table > end
+			
+			//out put table data
+			$(document).find('.kabR_tbl_data').html(kabR_tbl);
+			$(document).find('.second_tbl_data').html(second_tbl);
+			
+			$(document).find('.btn_save').hide();
+			$(document).find('.btn_cancel').hide();
+			
+			//--->make div editable > start
+			$(document).on('click', '.row_data', function(event)
+			{
+				event.preventDefault();
+				
+				if($(this).attr('edit_type') == 'button')
+				{
+					return false;
+				}
+				
+				//make div editable
+				$(this).closest('div').attr('contenteditable', 'true');
+				//add bg css
+				$(this).addClass('bg-warning').css('padding','5px');
+				
+				$(this).focus();
+			});
+			//--->make div editable > end
+			
+			//--->save single field data > start
+			$(document).on('focusout', '.row_data', function(event)
+			{
+				event.preventDefault();
+				
+				if($(this).attr('edit_type') == 'button')
+				{
+					return false;
+				}
+				
+				var row_id = $(this).closest('tr').attr('row_id');
+				var table_name = $(this).closest('tr').attr('table_name');
+				
+				var row_div = $(this)
+				.removeClass('bg-warning') //add bg css
+				.css('padding','');
+				
+				var col_name = row_div.attr('col_name');
+				var col_val = row_div.html();
+				
+				var arr = {};
+				arr[col_name] = col_val;
+				
+				//use the "arr" object for your ajax call
+				$.extend(arr, {row_id:row_id});
+				$.extend(arr, {table_name:table_name});
+				
+				//out put to show
+				<!-- $('.post_msg').html('<pre class="bg-success">'+JSON.stringify(arr, null, 2)+'</pre>'); -->
+			});
+			//--->save single field data > end
+			
+			//--->button > edit > start
+			$(document).on('click', '.btn_edit', function(event)
+			{
+				event.preventDefault();
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				
+				tbl_row.find('.btn_save').show();
+				tbl_row.find('.btn_cancel').show();
+				
+				//hide edit button
+				tbl_row.find('.btn_edit').hide();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('contenteditable', 'true')
+				.attr('edit_type', 'button')
+				.addClass('bg-warning')
+				.css('padding', '3px');
+				
+				//--->add the original entry > start
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					// this will help in case user decided to click on cancel button
+					$(this).attr('original_entry', $(this).html());
+				});
+				//--->add the original entry > end
+			});
+			//--->button > edit > end
+			
+			//--->button > cancel > start
+			$(document).on('click', '.btn_cancel', function(event)
+			{
+				event.preventDefault();
+				
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				
+				//hide save and cancel buttons
+				tbl_row.find('.btn_save').hide();
+				tbl_row.find('.btn_cancel').hide();
+				
+				//show edit button
+				tbl_row.find('.btn_edit').show();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('edit_type', 'click')
+				.removeClass('bg-warning')
+				.css('padding','');
+				
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					$(this).html( $(this).attr('original_entry') );
+				});
+			});
+			//--->button > cancel > end
+			
+			//--->save whole row entry > start
+			$(document).on('click', '.btn_save', function(event)
+			{
+				event.preventDefault();
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				var table_name = $(this).closest('tr').attr('table_name');
+				
+				//hide save and cancel buttons
+				tbl_row.find('.btn_save').hide();
+				tbl_row.find('.btn_cancel').hide();
+				
+				//show edit button
+				tbl_row.find('.btn_edit').show();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('edit_type', 'click')
+				.removeClass('bg-warning')
+				.css('padding','');
+				
+				//--->get row data > start
+				var arr = {};
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					var col_name = $(this).attr('col_name');
+					var col_val = $(this).html();
+					arr[col_name] = col_val;
+				});
+				//--->get row data > end
+				
+				//use the "arr" object for your ajax call
+				$.extend(arr, {row_id:row_id});
+				$.extend(arr, {table_name:table_name});
+				
+				//out put to show
+				<!-- $('.post_msg').html('<pre class="bg-success">'+JSON.stringify(arr, null, 2) +'</pre>'); -->
+			});
+			//--->save whole row entry > end
+			
+			//--->restore default > start
+			$(document).on('click', '.btn_restore', function(event)
+			{
+				event.preventDefault();
+				//console.log($(this).attr('table_name'));
+				if($(this).attr('table_name') == 'kabR table')
+				{
+					$(document).find('.kabR_tbl_data').html(kabR_tbl);
+				}
+				if($(this).attr('table_name') == 'second table')
+				{
+					$(document).find('.second_tbl_data').html(second_tbl);
+				}
+				$(document).find('.btn_save').hide();
+				$(document).find('.btn_cancel').hide();
+				<!-- $('.post_msg').html(''); -->
+			});
+			//--->restore default > end
+			
+			const btnCalc = document.getElementById("btnCalc");
+			
+			btnCalc.onclick = function(){
+				const kabR_table = document.getElementById("kabR table");
+				const second_table = document.getElementById("second table");
+				
+				let K = parseFloat(kabR_table.rows[1].cells[1].innerText); 
+				let a = parseFloat(kabR_table.rows[1].cells[2].innerText); 
+				let b = parseFloat(kabR_table.rows[1].cells[3].innerText);
+				
+				
+				var card = document.getElementById("calcOptions").value;
+				<!-- console.log(card); -->
+				if (card == 0) {
+					K = parseFloat(kabR_table.rows[1].cells[1].innerText); 
+					a = parseFloat(kabR_table.rows[1].cells[2].innerText); 
+					b = parseFloat(kabR_table.rows[1].cells[3].innerText);
+				}
+				if (card == 1) {
+					K = parseFloat(kabR_table.rows[2].cells[1].innerText); 
+					a = parseFloat(kabR_table.rows[2].cells[2].innerText); 
+					b = parseFloat(kabR_table.rows[2].cells[3].innerText);
+				}
+				if (card == 2) {
+					K = parseFloat(kabR_table.rows[3].cells[1].innerText); 
+					a = parseFloat(kabR_table.rows[3].cells[2].innerText); 
+					b = parseFloat(kabR_table.rows[3].cells[3].innerText);
+				}
+				
+				<!-- console.log(K); -->
+				<!-- console.log(a); -->
+				<!-- console.log(b); -->
+				
+				for (var i = 2, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					let previous_row = second_table.rows[i - 1];
+					let previous_total = parseFloat(previous_row.cells[4].innerText);
+					let growth_rate = parseFloat(row.cells[3].innerText);
+					row.cells[4].innerHTML = '<td ><div edit_type="click" col_name="总人口预测(万人)">'+ previous_total * (1 + growth_rate / 100) +'</div></td>';
+				}
+				
+				for (var i = 2, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					let previous_row = second_table.rows[i - 1];
+					let previous_total = parseFloat(previous_row.cells[5].innerText);
+					let growth_rate = parseFloat(row.cells[1].innerText);
+					row.cells[5].innerHTML = '<td ><div edit_type="click" col_name="人均GDP预测(万/人)">'+ previous_total * (1 + growth_rate / 100) +'</div></td>';
+				}
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					let factor1 = parseFloat(row.cells[4].innerText);
+					let factor2 = parseFloat(row.cells[5].innerText);
+					row.cells[2].innerHTML = '<td ><div edit_type="click" col_name="GDP预测(亿元)">'+ factor1 * factor2 +'</div></td>';;
+				}
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+					}  
+					let F = parseFloat(row.cells[5].innerText);
+					<!-- console.log(F); -->
+					let result = calcP(K,a,b,F);
+					<!-- console.log(parseFloat(row.cells[4].innerText) * result); -->
+					<!-- console.log(row.cells[6].innerHTML); -->
+					row.cells[6].innerHTML = '<div edit_type="click" col_name="私人保有率(辆/千人)">'+result+'</div>';
+					<!-- console.log(row.cells[7].innerHTML); -->
+					row.cells[7].innerHTML = '<div edit_type="click" col_name="车辆总量(万辆)">'+parseFloat(row.cells[4].innerText) * result / 1000+'</div>';
+					<!-- console.log(row.cells[7].innerHTML); -->
+				}
+				
+				localStorage.clear();
+				<!-- location.reload(); -->
+			}
+			
+			function calcP(K, a, b, F) {
+				return K * Math.pow(a, Math.pow(b, F));
+			}
+			
+			const btnGraph = document.getElementById("btnGraph");
+			btnGraph.onclick = function(){
+				const second_table = document.getElementById("second table");
+				let years = [];
+				let values = [];
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+					}  
+					years.push(parseFloat(row.cells[0].innerText));
+					values.push(parseFloat(row.cells[7].innerText));
+				}
+				
+				new Chart(document.getElementById("canvas"), {
+				  type: 'line',
+				  data: {
+					labels: years,
+					datasets: [{ 
+						data: values,
+						label: "车辆总量(万辆)",
+						borderColor: "#3e95cd",
+						fill: false
+					  }
+					]
+				  },
+				  options: {
+					title: {
+					  display: true,
+					  text: '横轴：年， 纵轴：车辆总量(万辆)'
+					}
+				  }
+				});
+			}
+			
+			const btnExcel = document.getElementById("btnExcel");
+			btnExcel.onclick = function(){
+				var wb = XLSX.utils.book_new();
+				wb.Props = {
+					Title: "model",
+					Subject: "",
+					Author: "",
+					CreatedDate: new Date()
+				};
+				wb.SheetNames.push("Test Sheet");
+				var ws_data = [];
+				
+				const kabR_table = document.getElementById("kabR table");
+				const second_table = document.getElementById("second table");
+				
+				for (var i = 0, row; row = kabR_table.rows[i]; i++) {
+					let rowList = []
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0; j < row.cells.length - 1; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+						rowList.push(row.cells[j].innerText)
+					}  
+					ws_data.push(rowList);
+				}
+				
+				for (var i = 0, row; row = second_table.rows[i]; i++) {
+					let rowList = []
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0; j < row.cells.length - 1; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+						rowList.push(row.cells[j].innerText)
+					}  
+					ws_data.push(rowList);
+				}
+				
+				var ws = XLSX.utils.aoa_to_sheet(ws_data);
+				wb.Sheets["Test Sheet"] = ws;
+				
+				var wbout = XLSX.write(wb, {bookType:'xlsx', type: 'binary'});
+				
+				saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'model.xlsx');
+			}
+			
+			function s2ab(s){
+				var buf = new ArrayBuffer(s.length);
+				var view = new Uint8Array(buf);
+				for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+				return buf;
+			}
+			
+		});
+
+		
+		</script>
+		
+	</head>
+	<body>
+		<div class="panel panel-default">
+			<div class="panel-heading"><b table_name="kabR table"> kabR table </b> </div>
+			<div class="panel-body">
+				<div class="kabR_tbl_data" ></div>
+			</div>
+			<span class="btn_restore" style="float: right" table_name="kabR table"> <a href="#" class="btn btn-link "> Restore Default</a> </span>
+		</div>
+		
+		<br>
+		<br>
+		<br>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading"><b table_name="不知道叫什么 table"> 不知道叫什么 table </b> </div>
+			<div class="panel-body">
+				<div class="second_tbl_data" ></div>
+			</div>
+			<span class="btn_restore" style="float: right" table_name="second table"> <a href="#" class="btn btn-link "> Restore Default</a> </span>
+		</div>
+		
+		<br>
+		<br>
+		<br>
+		
+		<div class='field select '>
+            <center> 选择kabR行计算方案: &nbsp;</center>
+            <div class="select margin-top-lg">
+              <select class="vertical-center" id="calcOptions" name="calcOptions">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+              <div class="select__arrow"></div>
+            </div>
+		</div>
+		
+		<button type="button" id="btnCalc" class="vertical-center">计算</button>
+		<button type="button" id="btnGraph" class="vertical-center">画图</button>
+		<button type="button" id="btnExcel" class="vertical-center">下载excel</button>
+		
+		<!-- <div class="panel panel-default"> -->
+			<!-- <div class="panel-heading"><b>HTML Table Edits/Updates</b> </div> -->
+			<!-- <div class="panel-body"> -->
+				<!-- <p>All changes will be displayed below</p> -->
+				<!-- <div class="post_msg"></div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+		
+		<canvas id="canvas" width="800" height="450"></canvas>
+		<form name='backToWelcomePage' action='/'>         
+			<button style='padding:2rem' type='submit' id = 'logbtn'>Back To Welcome Page</button>
+		</form>
+		<p>Step two <a href="/stepTwo"><font size=3><strong>Click Here</strong></a></p>
+		<p>Step three <a href="/stepThree"><font size=3><strong>Click Here</strong></a></p>
+		
+	</body>
+</html>
+

@@ -1,0 +1,657 @@
+<!doctype html>
+<html>
+	<head>
+		<style>
+			.vertical-center {
+				margin:0 auto;
+				display:block;
+			}
+		</style>
+		<meta charset="UTF-8">
+		<title>计算模型 step two</title>
+		<ul>
+			<li>确认拿出的数据 可直接点单个cell修改</li>
+			<li>如果你刷新界面，你的改动会全部丢失，回归default</li>
+			<li>如果你返回，改动会全部丢失</li>
+			<li>计算之前一定要在表格里留足够的数据，不然空缺的cell当0处理，用0计算</li>
+			<li>该有数字的cell若有非数字，cell当0处理，用0计算</li>
+			<li>画图,下载Excel完全根据表格里的数据，如果你不想搞笑，别忘先选方案，计算</li>
+		</ul> 
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="chart.js"></script>
+		<script src="jquery.js"></script>		
+		<script src="xlsx.full.min.js"></script>	
+		<script src="FileSaver.js"></script>	
+		<script type="text/javascript">
+		$(document).ready(function($)
+		{
+			//ajax row data
+			var elect_data = 
+			[
+				{"Light Duty":0.7, "Heavy Duty":0.1, "Specific Use":0.7, "Dump Truck":0.7},
+			]
+			
+			var 不知道叫什么_data = 
+			[
+				{"年":"2017", "LDT":" 15,344,633 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,597,080 ", "Straight Truck":" 3,917,520 ", "Specific use":" 482,500 ", "Dump Truck":" 475,398 ", "M&HDT sum":" 7,472,498 ", "道路用车SUM":" 6,989,998 ", "Light Duty Growth Rate":"4.9%", "Heavy Duty Growth Rate":"0.7%", "Specific Use Growth Rate":"4.9%", "Dump Truck Growth Rate":"4.9%", "经济增长率":"6.95%" },
+				{"年":"2018", "LDT":" 16,069,667 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,614,610 ", "Straight Truck":" 3,944,747 ", "Specific use":" 505,298 ", "Dump Truck":" 497,861 ", "M&HDT sum":" 7,562,516 ", "道路用车SUM":" 7,057,218 ", "Light Duty Growth Rate":"4.7%", "Heavy Duty Growth Rate":"0.7%", "Specific Use Growth Rate":"4.7%", "Dump Truck Growth Rate":"4.7%", "经济增长率":"6.75%" },
+				{"年":"2019", "LDT":" 16,812,086 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,631,867 ", "Straight Truck":" 3,971,374 ", "Specific use":" 528,643 ", "Dump Truck":" 520,862 ", "M&HDT sum":" 7,652,745 ", "道路用车SUM":" 7,124,102 ", "Light Duty Growth Rate":"4.6%", "Heavy Duty Growth Rate":"0.7%", "Specific Use Growth Rate":"4.6%", "Dump Truck Growth Rate":"4.6%", "经济增长率":"6.60%" },
+				{"年":"2020", "LDT":" 17,518,193 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,647,658 ", "Straight Truck":" 3,997,585 ", "Specific use":" 550,846 ", "Dump Truck":" 542,738 ", "M&HDT sum":" 7,738,827 ", "道路用车SUM":" 7,187,981 ", "Light Duty Growth Rate":"4.2%", "Heavy Duty Growth Rate":"0.6%", "Specific Use Growth Rate":"4.2%", "Dump Truck Growth Rate":"4.2%", "经济增长率":"6.00%" },
+				{"年":"2021", "LDT":" 18,204,009 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,662,465 ", "Straight Truck":" 4,021,570 ", "Specific use":" 572,411 ", "Dump Truck":" 563,985 ", "M&HDT sum":" 7,820,432 ", "道路用车SUM":" 7,248,021 ", "Light Duty Growth Rate":"3.9%", "Heavy Duty Growth Rate":"0.6%", "Specific Use Growth Rate":"3.9%", "Dump Truck Growth Rate":"3.9%", "经济增长率":"5.59%" },
+				{"年":"2022", "LDT":" 18,894,524 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,676,893 ", "Straight Truck":" 4,044,062 ", "Specific use":" 594,124 ", "Dump Truck":" 585,379 ", "M&HDT sum":" 7,900,457 ", "道路用车SUM":" 7,306,333 ", "Light Duty Growth Rate":"3.8%", "Heavy Duty Growth Rate":"0.5%", "Specific Use Growth Rate":"3.8%", "Dump Truck Growth Rate":"3.8%", "经济增长率":"5.42%" },
+				{"年":"2023", "LDT":" 19,590,252 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,690,974 ", "Straight Truck":" 4,065,976 ", "Specific use":" 616,000 ", "Dump Truck":" 606,933 ", "M&HDT sum":" 7,979,883 ", "道路用车SUM":" 7,363,883 ", "Light Duty Growth Rate":"3.7%", "Heavy Duty Growth Rate":"0.5%", "Specific Use Growth Rate":"3.7%", "Dump Truck Growth Rate":"3.7%", "经济增长率":"5.26%" },
+				{"年":"2024", "LDT":" 20,291,505 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,704,735 ", "Straight Truck":" 4,087,364 ", "Specific use":" 638,051 ", "Dump Truck":" 628,659 ", "M&HDT sum":" 8,058,808 ", "道路用车SUM":" 7,420,758 ", "Light Duty Growth Rate":"3.6%", "Heavy Duty Growth Rate":"0.5%", "Specific Use Growth Rate":"3.6%", "Dump Truck Growth Rate":"3.6%", "经济增长率":"5.11%" },
+				{"年":"2025", "LDT":" 21,001,821 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,718,261 ", "Straight Truck":" 4,108,266 ", "Specific use":" 660,386 ", "Dump Truck":" 650,666 ", "M&HDT sum":" 8,137,578 ", "道路用车SUM":" 7,477,192 ", "Light Duty Growth Rate":"3.5%", "Heavy Duty Growth Rate":"0.5%", "Specific Use Growth Rate":"3.5%", "Dump Truck Growth Rate":"3.5%", "经济增长率":"5.00%" },
+				{"年":"2026", "LDT":" 21,664,747 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,730,518 ", "Straight Truck":" 4,128,810 ", "Specific use":" 681,231 ", "Dump Truck":" 671,204 ", "M&HDT sum":" 8,211,763 ", "道路用车SUM":" 7,530,532 ", "Light Duty Growth Rate":"3.2%", "Heavy Duty Growth Rate":"0.5%", "Specific Use Growth Rate":"3.2%", "Dump Truck Growth Rate":"3.2%", "经济增长率":"4.51%" },
+				{"年":"2027", "LDT":" 22,329,846 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,742,493 ", "Straight Truck":" 4,147,428 ", "Specific use":" 702,145 ", "Dump Truck":" 691,810 ", "M&HDT sum":" 8,283,876 ", "道路用车SUM":" 7,581,731 ", "Light Duty Growth Rate":"3.1%", "Heavy Duty Growth Rate":"0.4%", "Specific Use Growth Rate":"3.1%", "Dump Truck Growth Rate":"3.1%", "经济增长率":"4.39%" },
+				{"年":"2028", "LDT":" 22,997,182 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,754,202 ", "Straight Truck":" 4,165,617 ", "Specific use":" 723,128 ", "Dump Truck":" 712,485 ", "M&HDT sum":" 8,355,432 ", "道路用车SUM":" 7,632,304 ", "Light Duty Growth Rate":"3.0%", "Heavy Duty Growth Rate":"0.4%", "Specific Use Growth Rate":"3.0%", "Dump Truck Growth Rate":"3.0%", "经济增长率":"4.27%" },
+				{"年":"2029", "LDT":" 23,667,076 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,765,663 ", "Straight Truck":" 4,183,402 ", "Specific use":" 744,193 ", "Dump Truck":" 733,239 ", "M&HDT sum":" 8,426,497 ", "道路用车SUM":" 7,682,304 ", "Light Duty Growth Rate":"2.9%", "Heavy Duty Growth Rate":"0.4%", "Specific Use Growth Rate":"2.9%", "Dump Truck Growth Rate":"2.9%", "经济增长率":"4.16%" },
+				{"年":"2030", "LDT":" 24,340,013 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,776,897 ", "Straight Truck":" 4,200,810 ", "Specific use":" 765,353 ", "Dump Truck":" 754,087 ", "M&HDT sum":" 8,497,148 ", "道路用车SUM":" 7,731,795 ", "Light Duty Growth Rate":"2.8%", "Heavy Duty Growth Rate":"0.4%", "Specific Use Growth Rate":"2.8%", "Dump Truck Growth Rate":"2.8%", "经济增长率":"4.06%" },
+				{"年":"2031", "LDT":" 24,950,690 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,786,850 ", "Straight Truck":" 4,217,874 ", "Specific use":" 784,555 ", "Dump Truck":" 773,007 ", "M&HDT sum":" 8,562,286 ", "道路用车SUM":" 7,777,731 ", "Light Duty Growth Rate":"2.5%", "Heavy Duty Growth Rate":"0.4%", "Specific Use Growth Rate":"2.5%", "Dump Truck Growth Rate":"2.5%", "经济增长率":"3.58%" },
+				{"年":"2032", "LDT":" 25,561,360 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,796,594 ", "Straight Truck":" 4,232,992 ", "Specific use":" 803,757 ", "Dump Truck":" 791,926 ", "M&HDT sum":" 8,625,269 ", "道路用车SUM":" 7,821,512 ", "Light Duty Growth Rate":"2.4%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.4%", "Dump Truck Growth Rate":"2.4%", "经济增长率":"3.50%" },
+				{"年":"2033", "LDT":" 26,172,121 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,806,140 ", "Straight Truck":" 4,247,792 ", "Specific use":" 822,962 ", "Dump Truck":" 810,849 ", "M&HDT sum":" 8,687,742 ", "道路用车SUM":" 7,864,781 ", "Light Duty Growth Rate":"2.4%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.4%", "Dump Truck Growth Rate":"2.4%", "经济增长率":"3.41%" },
+				{"年":"2034", "LDT":" 26,783,085 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,815,498 ", "Straight Truck":" 4,262,291 ", "Specific use":" 842,173 ", "Dump Truck":" 829,777 ", "M&HDT sum":" 8,749,740 ", "道路用车SUM":" 7,907,567 ", "Light Duty Growth Rate":"2.3%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.3%", "Dump Truck Growth Rate":"2.3%", "经济增长率":"3.33%" },
+				{"年":"2035", "LDT":" 27,394,680 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,824,683 ", "Straight Truck":" 4,276,506 ", "Specific use":" 861,404 ", "Dump Truck":" 848,725 ", "M&HDT sum":" 8,811,318 ", "道路用车SUM":" 7,949,914 ", "Light Duty Growth Rate":"2.3%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.3%", "Dump Truck Growth Rate":"2.3%", "经济增长率":"3.26%" },
+				{"年":"2036", "LDT":" 28,004,054 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,833,659 ", "Straight Truck":" 4,290,456 ", "Specific use":" 880,566 ", "Dump Truck":" 867,604 ", "M&HDT sum":" 8,872,285 ", "道路用车SUM":" 7,991,720 ", "Light Duty Growth Rate":"2.2%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.2%", "Dump Truck Growth Rate":"2.2%", "经济增长率":"3.18%" },
+				{"年":"2037", "LDT":" 28,616,014 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,842,505 ", "Straight Truck":" 4,304,090 ", "Specific use":" 899,808 ", "Dump Truck":" 886,564 ", "M&HDT sum":" 8,932,967 ", "道路用车SUM":" 8,033,159 ", "Light Duty Growth Rate":"2.2%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.2%", "Dump Truck Growth Rate":"2.2%", "经济增长率":"3.12%" },
+				{"年":"2038", "LDT":" 29,230,732 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,851,228 ", "Straight Truck":" 4,317,527 ", "Specific use":" 919,138 ", "Dump Truck":" 905,609 ", "M&HDT sum":" 8,993,501 ", "道路用车SUM":" 8,074,363 ", "Light Duty Growth Rate":"2.1%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.1%", "Dump Truck Growth Rate":"2.1%", "经济增长率":"3.07%" },
+				{"年":"2039", "LDT":" 29,848,393 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,859,835 ", "Straight Truck":" 4,330,776 ", "Specific use":" 938,559 ", "Dump Truck":" 924,745 ", "M&HDT sum":" 9,053,915 ", "道路用车SUM":" 8,115,356 ", "Light Duty Growth Rate":"2.1%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.1%", "Dump Truck Growth Rate":"2.1%", "经济增长率":"3.02%" },
+				{"年":"2040", "LDT":" 30,463,799 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,868,258 ", "Straight Truck":" 4,343,849 ", "Specific use":" 957,910 ", "Dump Truck":" 943,811 ", "M&HDT sum":" 9,113,829 ", "道路用车SUM":" 8,155,918 ", "Light Duty Growth Rate":"2.1%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"2.1%", "Dump Truck Growth Rate":"2.1%", "经济增长率":"2.95%" },
+				{"年":"2041", "LDT":" 31,000,541 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,875,478 ", "Straight Truck":" 4,356,644 ", "Specific use":" 974,788 ", "Dump Truck":" 960,440 ", "M&HDT sum":" 9,167,349 ", "道路用车SUM":" 8,192,561 ", "Light Duty Growth Rate":"1.8%", "Heavy Duty Growth Rate":"0.3%", "Specific Use Growth Rate":"1.8%", "Dump Truck Growth Rate":"1.8%", "经济增长率":"2.52%" },
+				{"年":"2042", "LDT":" 31,539,793 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,882,623 ", "Straight Truck":" 4,367,609 ", "Specific use":" 991,744 ", "Dump Truck":" 977,147 ", "M&HDT sum":" 9,219,123 ", "道路用车SUM":" 8,227,379 ", "Light Duty Growth Rate":"1.7%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.7%", "Dump Truck Growth Rate":"1.7%", "经济增长率":"2.48%" },
+				{"年":"2043", "LDT":" 32,078,959 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,889,663 ", "Straight Truck":" 4,378,463 ", "Specific use":" 1,008,698 ", "Dump Truck":" 993,851 ", "M&HDT sum":" 9,270,674 ", "道路用车SUM":" 8,261,976 ", "Light Duty Growth Rate":"1.7%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.7%", "Dump Truck Growth Rate":"1.7%", "经济增长率":"2.44%" },
+				{"年":"2044", "LDT":" 32,618,208 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,896,602 ", "Straight Truck":" 4,389,156 ", "Specific use":" 1,025,654 ", "Dump Truck":" 1,010,557 ", "M&HDT sum":" 9,321,969 ", "道路用车SUM":" 8,296,315 ", "Light Duty Growth Rate":"1.7%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.7%", "Dump Truck Growth Rate":"1.7%", "经济增长率":"2.40%" },
+				{"年":"2045", "LDT":" 33,151,839 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,903,372 ", "Straight Truck":" 4,399,696 ", "Specific use":" 1,042,434 ", "Dump Truck":" 1,027,090 ", "M&HDT sum":" 9,372,592 ", "道路用车SUM":" 8,330,158 ", "Light Duty Growth Rate":"1.6%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.6%", "Dump Truck Growth Rate":"1.6%", "经济增长率":"2.34%" },
+				{"年":"2046", "LDT":" 33,682,712 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,910,014 ", "Straight Truck":" 4,409,979 ", "Specific use":" 1,059,127 ", "Dump Truck":" 1,043,537 ", "M&HDT sum":" 9,422,656 ", "道路用车SUM":" 8,363,529 ", "Light Duty Growth Rate":"1.6%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.6%", "Dump Truck Growth Rate":"1.6%", "经济增长率":"2.29%" },
+				{"年":"2047", "LDT":" 34,214,301 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,916,575 ", "Straight Truck":" 4,420,067 ", "Specific use":" 1,075,842 ", "Dump Truck":" 1,060,006 ", "M&HDT sum":" 9,472,490 ", "道路用车SUM":" 8,396,648 ", "Light Duty Growth Rate":"1.6%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.6%", "Dump Truck Growth Rate":"1.6%", "经济增长率":"2.25%" },
+				{"年":"2048", "LDT":" 34,749,464 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,923,092 ", "Straight Truck":" 4,430,032 ", "Specific use":" 1,092,670 ", "Dump Truck":" 1,076,587 ", "M&HDT sum":" 9,522,381 ", "道路用车SUM":" 8,429,711 ", "Light Duty Growth Rate":"1.6%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.6%", "Dump Truck Growth Rate":"1.6%", "经济增长率":"2.23%" },
+				{"年":"2049", "LDT":" 35,292,676 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,929,620 ", "Straight Truck":" 4,439,931 ", "Specific use":" 1,109,751 ", "Dump Truck":" 1,093,416 ", "M&HDT sum":" 9,572,718 ", "道路用车SUM":" 8,462,967 ", "Light Duty Growth Rate":"1.6%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.6%", "Dump Truck Growth Rate":"1.6%", "经济增长率":"2.23%" },
+				{"年":"2050", "LDT":" 35,837,197 ", "MDB":" 786,649 ", "LDB":" 1,565,674 ", "Trackor":" 2,936,077 ", "Straight Truck":" 4,449,847 ", "Specific use":" 1,126,873 ", "Dump Truck":" 1,110,286 ", "M&HDT sum":" 9,623,082 ", "道路用车SUM":" 8,496,209 ", "Light Duty Growth Rate":"1.5%", "Heavy Duty Growth Rate":"0.2%", "Specific Use Growth Rate":"1.5%", "Dump Truck Growth Rate":"1.5%", "经济增长率":"2.20%" },
+			]
+			
+			var random_id = function()
+			{
+				var id_num = Math.random().toString(9).substr(2,3);
+				var id_str = Math.random().toString(36).substr(2);
+				
+				return id_num + id_str;
+			}
+			
+			//--->create data table > start
+			var elect_tbl = '';
+			elect_tbl +='<table class="table table-hover" id="elect table">'
+			
+				//--->create table header > start
+				elect_tbl +='<thead>';
+					elect_tbl +='<tr>';
+					elect_tbl +='<th>Light Duty</th>';
+					elect_tbl +='<th>Heavy Duty</th>';
+					elect_tbl +='<th>Specific Use</th>';
+					elect_tbl +='<th>Dump Truck</th>';
+					elect_tbl +='<th>Options</th>';
+					elect_tbl +='</tr>';
+			    elect_tbl +='</thead>';
+				//--->create table header > end
+			
+				//--->create table body > start
+				elect_tbl +='<tbody>';
+				
+					//let row_id = 0;
+					//--->create table body rows > start
+					$.each(elect_data, function(index, val)
+					{
+						//you can replace with your database row id
+						//var row_id = random_id();
+						var row_id = index;
+						//loop through ajax row data
+						elect_tbl +='<tr row_id="'+row_id+'" table_name="elect table">';
+							elect_tbl +='<td ><div class="row_data" edit_type="click" col_name="Light Duty">'+val['Light Duty']+'</div></td>';
+							elect_tbl +='<td ><div class="row_data" edit_type="click" col_name="Heavy Duty">'+val['Heavy Duty']+'</div></td>';
+							elect_tbl +='<td ><div class="row_data" edit_type="click" col_name="Specific Use">'+val['Specific Use']+'</div></td>';
+							elect_tbl +='<td ><div class="row_data" edit_type="click" col_name="Dump Truck">'+val['Dump Truck']+'</div></td>';
+							
+							//--->edit options > start
+							elect_tbl +='<td>';
+							
+								elect_tbl +='<span class="btn_edit" table_name="kabR table"> <a href="#" class="btn btn-link " row_id="'+row_id+'" > Edit</a> </span>';
+								
+								//only show this button if edit button is clicked
+								elect_tbl +='<span class="btn_save" table_name="kabR table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Save</a> | </span>';
+								elect_tbl +='<span class="btn_cancel" table_name="kabR table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Cancel</a> | </span>';
+								
+							elect_tbl +='</td>';
+							//--->edit options > end
+							
+						elect_tbl +='</tr>';
+						//++row_id;
+					});
+					
+					//--->create table body rows > end
+				
+				elect_tbl +='</tbody>';
+				//--->create table body > end
+				
+			elect_tbl +='</table>';
+			//--->create data table > end
+			
+			//--->create data table > start
+			var second_tbl = '';
+			second_tbl +='<table class="table table-hover" id="second table">'
+			
+				//--->create table header > start
+				second_tbl +='<thead>';
+					second_tbl +='<tr>';
+					second_tbl +='<th>年</th>';
+					second_tbl +='<th>LDT</th>';
+					second_tbl +='<th>MDB</th>';
+					second_tbl +='<th>LDB</th>';
+					second_tbl +='<th>Trackor</th>';
+					second_tbl +='<th>Straight Truck</th>';
+					second_tbl +='<th>Specific use</th>';
+					second_tbl +='<th>Dump Truck</th>';
+					second_tbl +='<th>M&HDT sum</th>';
+					second_tbl +='<th>道路用车SUM</th>';
+					second_tbl +='<th>Light Duty Growth Rate</th>';
+					second_tbl +='<th>Heavy Duty Growth Rate</th>';
+					second_tbl +='<th>Specific Use Growth Rate</th>';
+					second_tbl +='<th>Dump Truck Growth Rate</th>';
+					second_tbl +='<th>经济增长率</th>';
+					second_tbl +='<th>Options</th>';
+					second_tbl +='</tr>';
+			    second_tbl +='</thead>';
+				//--->create table header > end
+			
+				//--->create table body > start
+				second_tbl +='<tbody>';
+				
+					//let row_id = 0;
+					//--->create table body rows > start
+					$.each(不知道叫什么_data, function(index, val)
+					{
+						//you can replace with your database row id
+						//var row_id = random_id();
+						var row_id = index;
+						
+						//loop through ajax row data
+						second_tbl +='<tr row_id="'+row_id+'" table_name="second table">';
+							second_tbl +='<td ><div edit_type="click" col_name="年">'+val['年']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="LDT">'+val['LDT']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="MDB">'+val['MDB']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="LDB">'+val['LDB']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Trackor">'+val['Trackor']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Straight Truck">'+val['Straight Truck']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Specific use">'+val['Specific use']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Dump Truck)">'+val['Dump Truck']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="M&HDT sum">'+val['M&HDT sum']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="道路用车SUM">'+val['道路用车SUM']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Light Duty Growth Rate">'+val['Light Duty Growth Rate']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Heavy Duty Growth Rate">'+val['Heavy Duty Growth Rate']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Specific Use Growth Rate">'+val['Specific Use Growth Rate']+'</div></td>';
+							second_tbl +='<td ><div edit_type="click" col_name="Dump Truck Growth Rate">'+val['Dump Truck Growth Rate']+'</div></td>';
+							second_tbl +='<td ><div class="row_data" edit_type="click" col_name="经济增长率">'+parseFloat(val['经济增长率']) / 100+'</div></td>';
+							
+							//--->edit options > start
+							second_tbl +='<td>';
+							
+								second_tbl +='<span class="btn_edit" table_name="second table"> <a href="#" class="btn btn-link " row_id="'+row_id+'" > Edit</a> </span>';
+								
+								//only show this button if edit button is clicked
+								second_tbl +='<span class="btn_save" table_name="second table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Save</a> | </span>';
+								second_tbl +='<span class="btn_cancel" table_name="second table"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Cancel</a> | </span>';
+								
+							second_tbl +='</td>';
+							//--->edit options > end
+							
+						second_tbl +='</tr>';
+						//++row_id;
+					});
+					
+					//--->create table body rows > end
+				
+				second_tbl +='</tbody>';
+				//--->create table body > end
+				
+			second_tbl +='</table>';
+			//--->create data table > end
+			
+			//out put table data
+			$(document).find('.elect_tbl_data').html(elect_tbl);
+			$(document).find('.second_tbl_data').html(second_tbl);
+			
+			$(document).find('.btn_save').hide();
+			$(document).find('.btn_cancel').hide();
+			
+			//--->make div editable > start
+			$(document).on('click', '.row_data', function(event)
+			{
+				event.preventDefault();
+				
+				if($(this).attr('edit_type') == 'button')
+				{
+					return false;
+				}
+				
+				//make div editable
+				$(this).closest('div').attr('contenteditable', 'true');
+				//add bg css
+				$(this).addClass('bg-warning').css('padding','5px');
+				
+				$(this).focus();
+			});
+			//--->make div editable > end
+			
+			//--->save single field data > start
+			$(document).on('focusout', '.row_data', function(event)
+			{
+				event.preventDefault();
+				
+				if($(this).attr('edit_type') == 'button')
+				{
+					return false;
+				}
+				
+				var row_id = $(this).closest('tr').attr('row_id');
+				var table_name = $(this).closest('tr').attr('table_name');
+				
+				var row_div = $(this)
+				.removeClass('bg-warning') //add bg css
+				.css('padding','');
+				
+				var col_name = row_div.attr('col_name');
+				var col_val = row_div.html();
+				
+				var arr = {};
+				arr[col_name] = col_val;
+				
+				//use the "arr" object for your ajax call
+				$.extend(arr, {row_id:row_id});
+				$.extend(arr, {table_name:table_name});
+				
+				//out put to show
+				<!-- $('.post_msg').html('<pre class="bg-success">'+JSON.stringify(arr, null, 2)+'</pre>'); -->
+			});
+			//--->save single field data > end
+			
+			//--->button > edit > start
+			$(document).on('click', '.btn_edit', function(event)
+			{
+				event.preventDefault();
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				
+				tbl_row.find('.btn_save').show();
+				tbl_row.find('.btn_cancel').show();
+				
+				//hide edit button
+				tbl_row.find('.btn_edit').hide();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('contenteditable', 'true')
+				.attr('edit_type', 'button')
+				.addClass('bg-warning')
+				.css('padding', '3px');
+				
+				//--->add the original entry > start
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					// this will help in case user decided to click on cancel button
+					$(this).attr('original_entry', $(this).html());
+				});
+				//--->add the original entry > end
+			});
+			//--->button > edit > end
+			
+			//--->button > cancel > start
+			$(document).on('click', '.btn_cancel', function(event)
+			{
+				event.preventDefault();
+				
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				
+				//hide save and cancel buttons
+				tbl_row.find('.btn_save').hide();
+				tbl_row.find('.btn_cancel').hide();
+				
+				//show edit button
+				tbl_row.find('.btn_edit').show();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('edit_type', 'click')
+				.removeClass('bg-warning')
+				.css('padding','');
+				
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					$(this).html( $(this).attr('original_entry') );
+				});
+			});
+			//--->button > cancel > end
+			
+			//--->save whole row entry > start
+			$(document).on('click', '.btn_save', function(event)
+			{
+				event.preventDefault();
+				var tbl_row = $(this).closest('tr');
+				
+				var row_id = tbl_row.attr('row_id');
+				var table_name = $(this).closest('tr').attr('table_name');
+				
+				//hide save and cancel buttons
+				tbl_row.find('.btn_save').hide();
+				tbl_row.find('.btn_cancel').hide();
+				
+				//show edit button
+				tbl_row.find('.btn_edit').show();
+				
+				//make the whole row editable
+				tbl_row.find('.row_data')
+				.attr('edit_type', 'click')
+				.removeClass('bg-warning')
+				.css('padding','');
+				
+				//--->get row data > start
+				var arr = {};
+				tbl_row.find('.row_data').each(function(index, val)
+				{
+					var col_name = $(this).attr('col_name');
+					var col_val = $(this).html();
+					arr[col_name] = col_val;
+				});
+				//--->get row data > end
+				
+				//use the "arr" object for your ajax call
+				$.extend(arr, {row_id:row_id});
+				$.extend(arr, {table_name:table_name});
+				
+				//out put to show
+				<!-- $('.post_msg').html('<pre class="bg-success">'+JSON.stringify(arr, null, 2) +'</pre>'); -->
+			});
+			//--->save whole row entry > end
+			
+			//--->restore default > start
+			$(document).on('click', '.btn_restore', function(event)
+			{
+				event.preventDefault();
+				//console.log($(this).attr('table_name'));
+				if($(this).attr('table_name') == 'elect table')
+				{
+					$(document).find('.elect_tbl_data').html(elect_tbl);
+				}
+				if($(this).attr('table_name') == 'second table')
+				{
+					$(document).find('.second_tbl_data').html(second_tbl);
+				}
+				$(document).find('.btn_save').hide();
+				$(document).find('.btn_cancel').hide();
+				<!-- $('.post_msg').html(''); -->
+			});
+			//--->restore default > end
+			
+			const btnCalc = document.getElementById("btnCalc");
+			
+			btnCalc.onclick = function(){
+				const elect_table = document.getElementById("elect table");
+				const second_table = document.getElementById("second table");
+				
+				let LD = parseFloat(elect_table.rows[1].cells[0].innerText); 
+				let HD = parseFloat(elect_table.rows[1].cells[1].innerText); 
+				let SU = parseFloat(elect_table.rows[1].cells[2].innerText);
+				let DT = parseFloat(elect_table.rows[1].cells[3].innerText);
+				
+				/*
+				console.log(LD);
+				console.log(HD);
+				console.log(SU);
+				console.log(DT);
+				*/
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					row.cells[10].innerHTML = '<td ><div edit_type="click" col_name="Light Duty Growth Rate">'+ parseFloat(row.cells[14].innerText) * LD +'</div></td>';
+					row.cells[11].innerHTML = '<td ><div edit_type="click" col_name="Heavy Duty Growth Rate">'+ parseFloat(row.cells[14].innerText) * HD +'</div></td>';
+					row.cells[12].innerHTML = '<td ><div edit_type="click" col_name="Specific Use Growth Rate">'+ parseFloat(row.cells[14].innerText) * SU +'</div></td>';
+					row.cells[13].innerHTML = '<td ><div edit_type="click" col_name="Dump Truck Growth Rate">'+ parseFloat(row.cells[14].innerText) * DT +'</div></td>';
+				}
+				
+				
+				
+				for (var i = 2, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					let previous_row = second_table.rows[i - 1];
+					
+					let previous_LDT = parseFloat(previous_row.cells[1].innerText.replace(/,/g, ''));
+					let previous_Tractor = parseFloat(previous_row.cells[4].innerText.replace(/,/g, ''));
+					let previous_Straight_Truck = parseFloat(previous_row.cells[5].innerText.replace(/,/g, ''));
+					let previous_Specific_Use = parseFloat(previous_row.cells[6].innerText.replace(/,/g, ''));
+					let previous_Dump_Truck = parseFloat(previous_row.cells[7].innerText.replace(/,/g, ''));
+					
+					let LD_growth_rate = parseFloat(row.cells[10].innerText.replace(/,/g, ''));
+					let HD_growth_rate = parseFloat(row.cells[11].innerText.replace(/,/g, ''));
+					let SU_growth_rate = parseFloat(row.cells[12].innerText.replace(/,/g, ''));
+					let DT_growth_rate = parseFloat(row.cells[13].innerText.replace(/,/g, ''));
+					
+					row.cells[1].innerHTML = '<td ><div edit_type="click" col_name="LDT">'+ previous_LDT * (1 + LD_growth_rate) +'</div></td>';
+					row.cells[4].innerHTML = '<td ><div edit_type="click" col_name="Trackor">'+ previous_Tractor * (1 + HD_growth_rate) +'</div></td>';
+					row.cells[5].innerHTML = '<td ><div edit_type="click" col_name="Straight Truck">'+ previous_Straight_Truck * (1 + HD_growth_rate) +'</div></td>';
+					row.cells[6].innerHTML = '<td ><div edit_type="click" col_name="Specific use">'+ previous_Specific_Use * (1 + SU_growth_rate) +'</div></td>';
+					row.cells[7].innerHTML = '<td ><div edit_type="click" col_name="Dump Truck)">'+ previous_Dump_Truck * (1 + DT_growth_rate) +'</div></td>';
+				}
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+					}  
+					let current_Tractor = parseFloat(row.cells[4].innerText.replace(/,/g, ''));
+					let current_Straight_Truck = parseFloat(row.cells[5].innerText.replace(/,/g, ''));
+					let current_Specific_Use = parseFloat(row.cells[6].innerText.replace(/,/g, ''));
+					let current_Dump_Truck = parseFloat(row.cells[7].innerText.replace(/,/g, ''));
+					
+					row.cells[8].innerHTML = '<td ><div edit_type="click" col_name="M&HDT sum">'+ (current_Tractor + current_Straight_Truck + current_Specific_Use + current_Dump_Truck) +'</div></td>';
+					row.cells[9].innerHTML = '<td ><div edit_type="click" col_name="道路用车SUM">'+ (current_Tractor + current_Straight_Truck) +'</div></td>';
+				}
+				
+				
+				localStorage.clear();
+				<!-- location.reload(); -->
+			}
+			
+			function calcP(K, a, b, F) {
+				return K * Math.pow(a, Math.pow(b, F));
+			}
+			
+			const btnGraph = document.getElementById("btnGraph");
+			btnGraph.onclick = function(){
+				const second_table = document.getElementById("second table");
+				let years = [];
+				let values1 = [];
+				let values2 = [];
+				let values3 = [];
+				let values4 = [];
+				
+				for (var i = 1, row; row = second_table.rows[i]; i++) {
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0, col; col = row.cells[j]; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+					}  
+					years.push(parseFloat(row.cells[0].innerText.replace(/,/g, '')));
+					values1.push(parseFloat(row.cells[1].innerText.replace(/,/g, '')));
+					values2.push(parseFloat(row.cells[8].innerText.replace(/,/g, '')));
+					values3.push(parseFloat(row.cells[9].innerText.replace(/,/g, '')));
+					values4.push(parseFloat(row.cells[2].innerText.replace(/,/g, '')) + parseFloat(row.cells[3].innerText.replace(/,/g, '')));
+				}
+				
+				new Chart(document.getElementById("canvas"), {
+				  type: 'line',
+				  data: {
+					labels: years,
+					datasets: [
+					  { 
+						data: values1,
+						label: "LDT",
+						borderColor: "#3e95cd",
+						fill: false
+					  },
+					  { 
+						data: values2,
+						label: "M&HDT sum",
+						borderColor: "#8e5ea2",
+						fill: false
+					  },
+					  { 
+						data: values3,
+						label: "道路用车SUM",
+						borderColor: "#3cba9f",
+						fill: false
+					  },
+					  { 
+						data: values4,
+						label: "MDB + LDB",
+						borderColor: "#c45850",
+						fill: false
+					  }
+					]
+				  },
+				  options: {
+					title: {
+					  display: true,
+					  text: '横轴：年， 纵轴：Growth Rate'
+					}
+				  }
+				});
+			}
+			
+			const btnExcel = document.getElementById("btnExcel");
+			btnExcel.onclick = function(){
+				var wb = XLSX.utils.book_new();
+				wb.Props = {
+					Title: "model",
+					Subject: "",
+					Author: "",
+					CreatedDate: new Date()
+				};
+				wb.SheetNames.push("Test Sheet");
+				var ws_data = [];
+				
+				const elect_table = document.getElementById("elect table");
+				const second_table = document.getElementById("second table");
+				
+				for (var i = 0, row; row = elect_table.rows[i]; i++) {
+					let rowList = []
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0; j < row.cells.length - 1; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+						rowList.push(row.cells[j].innerText)
+					}  
+					ws_data.push(rowList);
+				}
+				
+				for (var i = 0, row; row = second_table.rows[i]; i++) {
+					let rowList = []
+					//iterate through rows
+					//rows would be accessed using the "row" variable assigned in the for loop
+					for (var j = 0; j < row.cells.length - 1; j++) {
+						//iterate through columns
+						//columns would be accessed using the "col" variable assigned in the for loop
+						<!-- console.log(col.innerText); -->
+						<!-- col.innerText = 0; -->
+						rowList.push(row.cells[j].innerText)
+					}  
+					ws_data.push(rowList);
+				}
+				
+				var ws = XLSX.utils.aoa_to_sheet(ws_data);
+				wb.Sheets["Test Sheet"] = ws;
+				
+				var wbout = XLSX.write(wb, {bookType:'xlsx', type: 'binary'});
+				
+				saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'model.xlsx');
+			}
+			
+			function s2ab(s){
+				var buf = new ArrayBuffer(s.length);
+				var view = new Uint8Array(buf);
+				for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+				return buf;
+			}
+			
+		});
+
+		
+		</script>
+		
+	</head>
+	<body>
+		<div class="panel panel-default">
+			<div class="panel-heading"><b table_name="elect table"> electicity table </b> </div>
+			<div class="panel-body">
+				<div class="elect_tbl_data" ></div>
+			</div>
+			<span class="btn_restore" style="float: right" table_name="elect table"> <a href="#" class="btn btn-link "> Restore Default</a> </span>
+		</div>
+		
+		<br>
+		<br>
+		<br>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading"><b table_name="不知道叫什么 table"> 不知道叫什么 table </b> </div>
+			<div class="panel-body">
+				<div class="second_tbl_data" ></div>
+			</div>
+			<span class="btn_restore" style="float: right" table_name="second table"> <a href="#" class="btn btn-link "> Restore Default</a> </span>
+		</div>
+		
+		<br>
+		<br>
+		<br>
+		
+		
+		
+		<button type="button" id="btnCalc" class="vertical-center">计算</button>
+		<button type="button" id="btnGraph" class="vertical-center">画图</button>
+		<button type="button" id="btnExcel" class="vertical-center">下载excel</button>
+		
+		<!-- <div class="panel panel-default"> -->
+			<!-- <div class="panel-heading"><b>HTML Table Edits/Updates</b> </div> -->
+			<!-- <div class="panel-body"> -->
+				<!-- <p>All changes will be displayed below</p> -->
+				<!-- <div class="post_msg"></div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+		
+		<canvas id="canvas" width="800" height="450"></canvas>
+		<form name='backToWelcomePage' action='/'>         
+			<button style='padding:2rem' type='submit' id = 'logbtn'>Back To Welcome Page</button>
+		</form>
+		<p>Step one <a href="/stepOne"><font size=3><strong>Click Here</strong></a></p>
+		<p>Step three <a href="/stepThree"><font size=3><strong>Click Here</strong></a></p>
+		
+	</body>
+</html>
+
