@@ -28,9 +28,7 @@
 			//ajax row data
 			var kabR_data = 
 			[
-				{情况:"基准情景", k:410, a:0.00605, b:0.78693},
-				{情况:"高饱和情景", k:505, a:0.00598, b:0.80759},
-				{情况:"低饱和情景", k:315, a:0.00537, b:0.74883},
+				{k:0},
 			]
 			
 			var 不知道叫什么_data = 
@@ -84,10 +82,7 @@
 				//--->create table header > start
 				kabR_tbl +='<thead>';
 					kabR_tbl +='<tr>';
-					kabR_tbl +='<th>情况</th>';
 					kabR_tbl +='<th>k</th>';
-					kabR_tbl +='<th>a</th>';
-					kabR_tbl +='<th>b</th>';
 					kabR_tbl +='<th>Options</th>';
 					kabR_tbl +='</tr>';
 			    kabR_tbl +='</thead>';
@@ -106,10 +101,7 @@
 						
 						//loop through ajax row data
 						kabR_tbl +='<tr row_id="'+row_id+'" table_name="kabR table">';
-							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="情况">'+val['情况']+'</div></td>';
 							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="k">'+val['k']+'</div></td>';
-							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="a">'+val['a']+'</div></td>';
-							kabR_tbl +='<td ><div class="row_data" edit_type="click" col_name="b">'+val['b']+'</div></td>';
 							
 							//--->edit options > start
 							kabR_tbl +='<td>';
@@ -584,7 +576,7 @@
 	</head>
 	<body>
 		<div class="panel panel-default">
-			<div class="panel-heading"><b table_name="kabR table"> kabR table </b> </div>
+			<div class="panel-heading"><b table_name="kabR table"> 弹性系数 table </b> </div>
 			<div class="panel-body">
 				<div class="kabR_tbl_data" ></div>
 			</div>

@@ -38,8 +38,24 @@ def get_step_one(req):
 def get_step_two(req):
   return render_to_response('templates/stepTwo.html', {}, request=req)  
   
-def get_step_three(req):
-  return render_to_response('templates/stepThree.html', {}, request=req)  
+def get_read_txt(req):
+  write_to_file()
+  return render_to_response('templates/read_txt.html', {}, request=req) 
+  
+def write_to_file():
+    # Connect to the database
+    db = mysql.connect(user=db_user, password=db_pass, host=db_host, database=db_name)
+    cursor = db.cursor()
+    cursor.execute("select * from bauco2;")
+    file_path = './public/content.txt'
+    f = open(file_path, "w")
+    f.write('---------- DATABASE INITIALIZED ----------\n')
+    for x in cursor:
+        f.write(str(x) + '\n')
+    f.close()
+    # print('---------- DATABASE INITIALIZED ----------')
+    # [print(x) for x in cursor]
+    db.close()
 
 ''' Route Configurations '''
 if __name__ == '__main__':
@@ -66,8 +82,8 @@ if __name__ == '__main__':
   config.add_route('get_step_two', '/stepTwo')
   config.add_view(get_step_two, route_name='get_step_two')
   
-  config.add_route('get_step_three', '/stepThree')
-  config.add_view(get_step_three, route_name='get_step_three')
+  config.add_route('get_read_txt', '/readTxt')
+  config.add_view(get_read_txt, route_name='get_read_txt')
 
   config.add_static_view(name='/', path='./public', cache_max_age=3600)
 

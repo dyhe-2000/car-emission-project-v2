@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>read txt file</title>
+</head>
+
+<body>
+<div style='padding:2rem'>
+  <h1>read txt file</h1>  
+</div>
+
+<div style='padding:4rem'>  
+    <div id="pageDiv">
+  <td><input type="submit" id = 'see content' onclick="return getFile()" value="see content" style='padding:2rem'></td>
+    </div>
+    
+    <form name='field' method='POST' id="contentsFromFile">
+      <div class='warning' style='color:maroon'>
+       {% if error is defined %}
+          {{ error }}
+       {% endif %}
+      </div>
+    </form>
+     
+    <form name='Go_back' action='/'>     
+      <button type='submit' id = 'logbtn'> Go Back</button>
+    </form>
+    
+  </div>
+  
+<script type = "text/javascript">
+    if(document.referrer === '')window.location = 'login'
+</script> 
+
+<script language="javascript"> 
+function getFile(){
+ var fileName="content.txt", xmlHttp=new XMLHttpRequest();
+ xmlHttp.onreadystatechange=function(){
+  var tmpDoc, re=/^(.+)$/gm, arr=[], oP;
+  if(xmlHttp.readyState===4){
+   if(xmlHttp.status===200){
+    tmpDoc=xmlHttp.responseText;
+    arr=re.exec(tmpDoc);
+    counter = 0;
+    while(arr!==null){
+	 console.log(arr)
+     oP=document.createElement("P");
+     document.getElementById("contentsFromFile").appendChild(oP).appendChild(document.createTextNode(arr[1]));
+     document.getElementById("contentsFromFile").appendChild(document.createTextNode("\r\n"));
+     //insert tests -> for style/format
+     <!-- if(arr[1].substr(0,4)==="John"){ -->
+      <!-- oP.style.color="#f00"; -->
+     <!-- } -->
+     <!-- alert(arr[1].split(" ")[3]==="verified"); -->
+     arr=re.exec(tmpDoc);
+     counter = counter + 1; //counter increment by 3
+    }
+    xmlHttp=null;
+   }
+  }
+ };
+ xmlHttp.open("POST", fileName, true); //Use POST to prevent use of cached file
+ xmlHttp.send();
+}
+</script>
+
+
+</body>
+
+</html>
